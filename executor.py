@@ -5,7 +5,7 @@ from itertools import permutations
 from collections import defaultdict
 import pandas as pd
 import numpy as np
-
+import time
 
 def GA_analyze(path):
 
@@ -62,16 +62,24 @@ def GA_analyze(path):
 
 
 path = "instances/eil51.vrp..txt"
-data = GA_analyze(path)
+#data = GA_analyze(path)
 
 
+#T, alfa, max_times, number_executions = 1000, 0.5, 400, 200 #SA params
+generations, news, population_size, survivors = 5, 100, 500, 200
+#SA = SimulatedAnnealing(path=path, T=T, alfa=alfa, max_times=max_times)
+start = time.time()
 
-
-T, alfa, max_times, number_executions = 1000, 0.5, 400, 200 #SA params
-generations, news, population_size, survivors = 200, 20, 100, 50
-SA = SimulatedAnnealing(path=path, T=T, alfa=alfa, max_times=max_times)
-best_rote, dist = SA.simulated_annealing()
 GA = GeneticAlgorithm(path=path, generations=generations, news=news, population_size=population_size, survivors=survivors)
-population, fitness, best_route, best_dist = GA.genetic_algorithm()
-all_results, best_result = SA.multiple_executions(number_executions=number_executions, initial_solution=best_route)
-print(f'menor resultado é: {best_result}')
+i = 0
+test_time = list()
+while i < 1:
+    print(i)
+    best_dist = GA.genetic_algorithm(save=True)
+    test_time.append(best_dist)
+    i+= 1
+#all_results, best_result = SA.multiple_executions(number_executions=number_executions, initial_solution=best_route)
+print(f'menor resultado é: {min(test_time)}')
+end = time.time()
+
+print("The time of execution of above program is :", end-start)
