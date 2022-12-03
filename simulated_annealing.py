@@ -7,10 +7,10 @@ import copy
 import random
 import math
 from reader_tspLIB import ReadTSPLIB
-from commons import CommonsVRP
+import commons
 
 @dataclass
-class SimulatedAnnealing(CommonsVRP):
+class SimulatedAnnealing():
     path: str
     T: float = 1000
     alfa: float = 0.99
@@ -24,7 +24,6 @@ class SimulatedAnnealing(CommonsVRP):
         self.matrix = self.problem.get_matrix()
         self.demands = self.problem.get_demands()
         self.initial_vector = copy.deepcopy(self.nodes[1:]) #TODO: Change this use the first node
-        self.commons = CommonsVRP()
 
     def randon_change(self, vetor):
         #TODO: Use 2-opt to create new vector? PLEASE USE NUMPY TO IMPROVE THIS!!!!

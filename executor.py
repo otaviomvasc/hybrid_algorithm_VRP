@@ -61,12 +61,12 @@ def GA_analyze(path):
 
 
 
-path = "instances/eil51.vrp..txt"
+path = "instances/A-n32-k5.txt"
 #data = GA_analyze(path)
 
 
 #T, alfa, max_times, number_executions = 1000, 0.5, 400, 200 #SA params
-generations, news, population_size, survivors = 5, 100, 500, 200
+generations, news, population_size, survivors = 2000, 150, 150, 75
 #SA = SimulatedAnnealing(path=path, T=T, alfa=alfa, max_times=max_times)
 start = time.time()
 
@@ -75,7 +75,7 @@ i = 0
 test_time = list()
 while i < 1:
     print(i)
-    best_dist = GA.genetic_algorithm(save=True)
+    best_dist = GA.genetic_algorithm()
     test_time.append(best_dist)
     i+= 1
 #all_results, best_result = SA.multiple_executions(number_executions=number_executions, initial_solution=best_route)

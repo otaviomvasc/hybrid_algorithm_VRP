@@ -37,7 +37,7 @@ class ReadTSPLIB:
         try:  #TODO: Will find one best way to get the number of vehicles!!
             return int(aux[1][19])
         except:
-            return int(aux[0][19])
+            return int(aux[1][15])
 
 
 if __name__ == '__main__':
