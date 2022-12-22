@@ -10,38 +10,34 @@ import time
 def GA_analyze(path):
 
     #Analises individuais dos parametros, com base em mil gerações!!
-    gen = 2350
-    best_pop_size = 60
-    best_news = 54
+    # generations  = [100, 3001 - 100 em 100}
+    # n_individuos = 0.1 - 1 da qntd de individuos 0.1 - 0.1
+    # pop = 50 - 500 50/50
+    cont_save_data=0
 
+    result_aux = list()
 
+    rep = 0
     all_data = list()
     same_repetitions = 30
-    save_data = 200
-
-    #parou na generation 350, news_iter 18 e pop_size 290
-    cont_save_data=0
-    rep = 0
-    result_aux = list()
-    row = 1
-    #TODO: Use np.linspace
-    generations_iter = [i for i in range(50, 3001, 50)]
-    news_iter = [i for i in range(2, 50, 4)]
-    pop_size_iter = [i for i in range(10, 301, 20)]
+    save_data = 30
+    generations_iter = np.arange(100, 3001, 100)
+    news_iter = np.arange(0.1, 1.01, 0.1)
+    pop_size_iter = np.arange(50, 501, 50)
     for gen in generations_iter:
         for news in news_iter:
             for pop_size in pop_size_iter:
-                print(gen, news, pop_size)
+                print(gen, news*gen, pop_size)
 
                 while rep <= same_repetitions:
                     GA = GeneticAlgorithm(
                         path=path,
-                        news=news,
+                        news=int(news * gen),
                         generations=gen,
                         population_size=pop_size,
-                        survivors=(best_pop_size / 2))
-                    #TODO: Save one best_values per df line or save a list of best_fitness?
-                    best_value = GA.genetic_algorithm(save=True)
+                        survivors=int(pop_size / 2))
+                    best_value, _ = GA.genetic_algorithm()
+
                     result_aux.append(best_value)
                     rep += 1
 
@@ -62,24 +58,10 @@ def GA_analyze(path):
 
 
 path = "instances/A-n32-k5.txt"
-#data = GA_analyze(path)
+GA_analyze(path)
 
 
-#T, alfa, max_times, number_executions = 1000, 0.5, 400, 200 #SA params
-generations, news, population_size, survivors = 2000, 150, 150, 75
-#SA = SimulatedAnnealing(path=path, T=T, alfa=alfa, max_times=max_times)
-start = time.time()
 
-GA = GeneticAlgorithm(path=path, generations=generations, news=news, population_size=population_size, survivors=survivors)
-i = 0
-test_time = list()
-while i < 1:
-    print(i)
-    best_dist = GA.genetic_algorithm()
-    test_time.append(best_dist)
-    i+= 1
-#all_results, best_result = SA.multiple_executions(number_executions=number_executions, initial_solution=best_route)
-print(f'menor resultado é: {min(test_time)}')
-end = time.time()
 
-print("The time of execution of above program is :", end-start)
+
+

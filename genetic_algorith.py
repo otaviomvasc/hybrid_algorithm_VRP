@@ -28,8 +28,6 @@ class Individuo(object):
         routes = commons.define_routes(vetor=self.ind, demands=demands, vehicle_capacity=vehicle_capacity)
         self.calculate = commons.dist_calculate(vet_aux=routes, matrix=matrix)
 
-
-
     def fitness(self):
         return self.calculate
 
@@ -58,7 +56,6 @@ class GeneticAlgorithm():
     def population_generation(self, pop):
         self.population = [Individuo(size=len(self.nodes)) for i in range(pop)]
 
-
     def create_mutation(self):
         new_i = 0
         while new_i < self.news:
@@ -66,7 +63,6 @@ class GeneticAlgorithm():
             n_ind = commons.change_two_opt(ind)
             self.population.append(Individuo(new_ind=n_ind))
             new_i += 1
-
 
     def sort_population(self):
         self.population = sorted(self.population, key=Individuo.fitness)  #ordenar objetos !!
@@ -85,7 +81,7 @@ class GeneticAlgorithm():
             self.sort_population()
             self.population = self.population[:self.survivors]
             self.create_new_generation()
-            print(self.population[0].fitness(), actual_generation)
+            #   print(self.population[0].fitness(), actual_generation)
             actual_generation += 1
 
         self.sort_population()
