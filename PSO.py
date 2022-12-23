@@ -14,7 +14,7 @@ class Individuo(object):
     def __init__(self, new_ind=None, size=None, change_vel=None):
         if new_ind is None:
             ind = list(range(1, size))
-            position = [random.uniform(0,1) for i in range(1,size)]
+            position = [random.uniform(-1,1) for i in range(1,size)]
             self.order_per_position(ind, position)
             self.velocity = np.array([random.uniform(-4.0,4.0) for i in range(len(self.ind))])
             routes = commons.define_routes(vetor=self.ind, demands=demands, vehicle_capacity=vehicle_capacity)
@@ -45,11 +45,9 @@ class Individuo(object):
     def fitness(self):
         return self.fit
 
-    def velocity_calculate(self): #TODO: will Velocity interval one parameter?
-        return np.array([random.uniform(-4.0,4.0) for i in range(len(self.ind))])
+    def velocity_calculation(self, best, c1r1, c2r2):
+        self.velocity = self.velocity + c1r1 * (self.best_local.position - self.position) + c2r2 * (best.position - self.position)
 
-    def new_position(self):
-        pass
 
 if __name__ == "__main__":
     path = "instances/eil23.vrp.txt"
@@ -61,51 +59,31 @@ if __name__ == "__main__":
     demands = problem.get_demands()
     coords = problem.get_coords()
     nodes = problem.get_node_list()
-    pop = 50
-    generations = 100
-    c1r1 = 0.8
-    c2r2 = 0.8
+    pop = 500
+    iterations = 400
+    i = 0
+    c1r1 = 1.2
+    c2r2 = 1.8
 
 
     population = [Individuo(size=len(nodes)) for i in range(pop)]
     g_best = min([p.fitness() for p in population])
-    best = [p for p in population if p.fitness() == g_best]
+    best = [p for p in population if p.fitness() == g_best][0]
 
-    #isso vai ser feito já no init!!
-    population[0].position = population[0].position + population[0].velocity
-    population[0].order_per_position()
-    population[0].fitness_calculation(demands, vehicle_capacity, matrix)
-    population[0].best_local_actualize()
-    g_best = min([p.fitness() for p in population])
-    best = [p for p in population if p.fitness() == g_best]
-
-    population[0].velocity = [population[0].velocity[i] + c1r1 * (population[0].best_local.position[i] - population[0].position[i]) + c2r2 * (
-                best[0].position[i] - population[0].position[i]) for i in range(len(population[0].ind))]
+    while i < iterations:
+        #atualizar o position, fit e best_local
+        for ind in population:
+            ind.velocity_calculation(best, c1r1, c2r2)
+            ind.position = ind.position + ind.velocity
+            ind.order_per_position()
+            ind.fitness_calculation(demands, vehicle_capacity, matrix)
+            ind.best_local_actualize()
 
 
-
-
-
-    """
-    criar classe individuo, que cria um vetor com a rota, outro com a velocidade, outro com a dimensao (confirmar nome) e o fitness
-    utilizando o metodo new
-    
-    defino g_best
-    
-    while True:
-        calculo nova velocidade de cada individuo
-        calculo a posição de cada individuo
-            função sigmoide de probabilidade 
-        
-        ordeno cada individuo de acordo com a position de forma decrescente - Confirmar isso
-        calculo fitness
-        
-        redefino o g_best
-        
-    Dúvidas:
-        na hora de calcular a posição eu uso o gbest e o pbest ou os valores aleatórios do position??
-    """
-
-
-
-
+        g_best_candidate = min([p.fitness() for p in population])
+        best_candidate = [p for p in population if p.fitness() == g_best_candidate][0]
+        if best_candidate.fitness() < best.fitness():
+            best = deepcopy(best_candidate)
+        print(f'iteração {i} gerou um fitness de: {best.fitness()}')
+        i += 1
+    print(f'Melhor best foi de: {best.fitness()}')
