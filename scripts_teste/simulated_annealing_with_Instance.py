@@ -8,6 +8,7 @@ import random
 import math
 from reader_tspLIB import ReadTSPLIB
 import commons
+from instance import Instance
 
 @dataclass
 class SimulatedAnnealing():
@@ -17,12 +18,12 @@ class SimulatedAnnealing():
     max_times: int = 400
 
     def __post_init__(self):
-        self.problem = ReadTSPLIB(self.path)
-        self.nodes = self.problem.get_node_list()
-        self.vehicle_capacity = self.problem.get_vehicle_capacites()
-        self.n_vehicles = self.problem.get_number_of_vehicles()
-        self.matrix = self.problem.get_matrix()
-        self.demands = self.problem.get_demands()
+        self.problem = Instance().load_instance(self.path)
+        self.nodes = list(range(0, self.problem.dimension))
+        self.vehicle_capacity = self.problem.capacity
+        self.n_vehicles = None
+        self.matrix = self.problem.node_distances
+        self.demands = self.problem.node_demand
         self.initial_vector = copy.deepcopy(self.nodes[1:]) #TODO: Change this use the first node
 
     def randon_change(self, vetor):
@@ -39,8 +40,8 @@ class SimulatedAnnealing():
 
     def energy_calculate(self, new_vetor, initial=False):
         new_vetor = new_vetor if initial else commons.change_two_opt(new_vetor)
-        separte_routes = commons.define_routes(new_vetor, self.demands, self.vehicle_capacity)
-        dist_total = commons.dist_calculate(separte_routes, self.matrix)
+        separte_routes = Instance().compute_vrp_routes(nodes = new_vetor, node_demand=self.demands, capacity=self.vehicle_capacity)
+        dist_total = Instance().compute_vrp_distance(routes=separte_routes, nodes=new_vetor, matrix=self.matrix)
 
         return new_vetor, dist_total
 

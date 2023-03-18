@@ -16,6 +16,7 @@ def GA_analyze(path):
     cont_save_data=0
 
     result_aux = list()
+    #TODO: usar np.seed
 
     rep = 0
     all_data = list()
@@ -56,10 +57,19 @@ def GA_analyze(path):
     a=0
 
 
+path = "instances/eil51.vrp..txt"
+GA = GeneticAlgorithm(
+                        path=path,
+                        news=50,
+                        generations=400,
+                        population_size=200,
+                        survivors=int(200 / 2))
 
-path = "instances/A-n32-k5.txt"
-GA_analyze(path)
+SA = SimulatedAnnealing(path=path)
+best_value, best_pop = GA.genetic_algorithm()
+vector, best_rote, e_base = SA.simulated_annealing(initial_solution=best_pop)
 
+print(best_value, e_base)
 
 
 
