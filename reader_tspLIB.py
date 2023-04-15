@@ -26,8 +26,7 @@ class ReadTSPLIB:
         matrix = np.zeros((nodes[-1] + 1, nodes[-1] + 1))
         for i in nodes:
             for j in nodes:
-                matrix[i, j] = np.ceil(
-                    np.linalg.norm(np.array((coords[i][0], coords[i][1])) - np.array((coords[j][0], coords[j][1]))))
+                matrix[i, j] = np.linalg.norm(np.array((coords[i][0], coords[i][1])) - np.array((coords[j][0], coords[j][1])))
         #matrix = [[np.ceil(np.linalg.norm(np.array((coords[i][0], coords[i][1]))-np.array((coords[j][0],coords[j][1])))) for j in nodes] for i in nodes]
         return np.matrix(matrix)
 

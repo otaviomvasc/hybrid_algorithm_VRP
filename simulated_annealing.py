@@ -13,7 +13,7 @@ import commons
 class SimulatedAnnealing():
     path: str
     T: float = 500
-    alfa: float = 0.05
+    alfa: float = 0.1
     max_times: int = 400
 
     def __post_init__(self):

@@ -13,27 +13,22 @@ import numpy as np
 
 
 def define_routes(vetor, demands, vehicle_capacity):
-    reset = True
-    while reset:
-        reset = False
-        cap = 0
-        vet_aux = list()
-        aux = list()
-        for i in range(len(vetor)):
-            if cap + demands[vetor[i]] <= vehicle_capacity:
-                cap += demands[vetor[i]]
-                aux.append(vetor[i])
-            else:
-                vet_aux.append(aux[:])
-                aux.clear()
-                cap = demands[vetor[i]]
-                aux.append(vetor[i])
 
-            if i == (len(vetor) - 1):
-                vet_aux.append(aux[:])
+    cap = 0
+    vet_aux = list()
+    aux = list()
+    for i in range(len(vetor)):
+        if cap + demands[vetor[i]] <= vehicle_capacity:
+            cap += demands[vetor[i]]
+            aux.append(vetor[i])
+        else:
+            vet_aux.append(aux[:])
+            aux.clear()
+            cap = demands[vetor[i]]
+            aux.append(vetor[i])
 
-            if len(vet_aux) > 5:
-                reset = True
+        if i == (len(vetor) - 1):
+            vet_aux.append(aux[:])
 
     return vet_aux
 

@@ -38,10 +38,10 @@ class Individuo(object):
 @dataclass
 class GeneticAlgorithm():
     path: str
-    generations: int = 800
+    generations: int = 100
     news: int = 80
-    population_size: int = 150
-    survivors: int = 120
+    population_size: int = 50
+    survivors: int = 25
     base_per_generation: int = field(init=False)
 
     def __post_init__(self):
@@ -110,8 +110,11 @@ class GeneticAlgorithm():
 
 
 if __name__ == "__main__":
+    inicio = time.time()
     path = "instances/A-n32-k5.txt"
     GA = GeneticAlgorithm(path=path)
     best, best_value = GA.genetic_algorithm()
     print(best)
     print(best_value)
+    fim = time.time()
+    print(fim - inicio)
