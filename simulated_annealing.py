@@ -12,12 +12,13 @@ import commons
 @dataclass
 class SimulatedAnnealing():
     path: str
-    T: float = 500
+    T: float = 10000
     alfa: float = 0.1
-    max_times: int = 400
+    max_times: int = 10000
 
     def __post_init__(self):
         self.problem = ReadTSPLIB(self.path)
+        self.nodes = self.problem.get_node_list()
         self.nodes = self.problem.get_node_list()
         self.vehicle_capacity = self.problem.get_vehicle_capacites()
         self.n_vehicles = self.problem.get_number_of_vehicles()
