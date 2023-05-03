@@ -36,13 +36,16 @@ class Individuo(object):
 
 
 @dataclass
-class GeneticAlgorithm():
+class Hibryd_Genetic_Algorithm():
     path: str
-    generations: int = 1000
-    news: int = 240
+    T_SA: int = 10000
+    alfa_SA: float = 0.1
+    generations: int = 1400
+    news: int = 350
     population_size: int = 100
     survivors: int = 50
     base_per_generation: int = field(init=False)
+
 
     def __post_init__(self):
         global vehicle_capacity, n_vehicles, matrix, demands
@@ -55,7 +58,7 @@ class GeneticAlgorithm():
         demands = self.problem.get_demands()
         self.base_per_generation = 30
         self.population = list()
-
+        self.SA = SimulatedAnnealing(path=self.path, T=self.T_SA, alfa=self.alfa_SA)
     def population_generation(self, pop):
         self.population = [Individuo(size=len(self.nodes)) for i in range(pop)]
 
@@ -68,9 +71,12 @@ class GeneticAlgorithm():
             new_i += 1
 
     def create_mutation_SA(self):
-        SA = SimulatedAnnealing(path=path)
+        # if self.T_SA and self.alfa_SA:
+        #     SA = SimulatedAnnealing(path=self.path, T=self.T_SA, alfa=self.alfa_SA)
+        # else:
+        #     SA = SimulatedAnnealing(path=path)
         ind = self.population[0].ind.copy()
-        n_ind, _,  fit = SA.simulated_annealing(initial_solution=ind)
+        n_ind, _,  fit = self.SA.simulated_annealing(initial_solution=ind)
         self.population.append(Individuo(new_ind=n_ind))
 
     def sort_population(self):
@@ -80,35 +86,44 @@ class GeneticAlgorithm():
         self.population.extend([Individuo(size=len(self.nodes)) for i in range(self.population_size - self.survivors)])
 
     def specialist(self):
-        aux = list(self.nodes[1:])
-        specialist = list()
-        v = random.randint(2, len(self.nodes) + 1)
-        aux.remove(v)
-        specialist.append(v)
-        while aux:
-            list_aux = list(np.array(matrix[v])[0])
-            v = list_aux.index(min([x for x in list_aux if x > 0 and list_aux.index(x) in aux]))
-            specialist.append(v)
-            aux.remove(v)
+        nodes = list(self.nodes[1:])
+        cur_node = random.randint(2, len(self.nodes))
+        solution = [cur_node]
+        free_nodes = set(nodes)
+        free_nodes.remove(cur_node)
+        while free_nodes:
+            next_node = min(free_nodes, key=lambda x: matrix[cur_node, x])
+            free_nodes.remove(next_node)
+            solution.append(next_node)
+            cur_node = next_node
 
-        self.population.append(Individuo(new_ind=specialist))
+        self.population.append(Individuo(new_ind=solution))
 
     def genetic_algorithm(self):
 
         self.population_generation(self.population_size)
+        break_condition = 300
+        break_count = 0
         actual_generation = 0
-        self.specialist()
+        if len(self.nodes) > 50:
+            self.specialist()
+        best = self.population[0].fitness()
         while actual_generation < self.generations:
-            #self.create_mutation_SA()
+            self.create_mutation_SA()
             self.create_mutation()
             self.sort_population()
+            if best == self.population[0].fitness():
+                break_count += 1
+                if break_count == break_condition:
+                    break
+            else:
+                break_count = 0
+                best = self.population[0].fitness()
+            #print(self.population[0].fitness(), actual_generation)
             self.create_mutation_SA()
             self.population = self.population[:self.survivors]
             self.create_new_generation()
-            print(self.population[0].fitness(), actual_generation)
-
-            break_count = 0
-            print(actual_generation)
+            #print(actual_generation)
             actual_generation += 1
 
         self.sort_population()
@@ -119,7 +134,7 @@ class GeneticAlgorithm():
 if __name__ == "__main__":
     inicio = time.time()
     path = "instances/A-n32-k5.txt"
-    GA = GeneticAlgorithm(path=path)
+    GA = Hibryd_Genetic_Algorithm(path=path)
     best, best_value = GA.genetic_algorithm()
     fim = time.time()
     print(best)

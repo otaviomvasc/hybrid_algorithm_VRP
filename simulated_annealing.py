@@ -8,13 +8,14 @@ import random
 import math
 from reader_tspLIB import ReadTSPLIB
 import commons
+import pandas as pd
 
 @dataclass
 class SimulatedAnnealing():
     path: str
-    T: float = 10000
+    T: float = 1000
     alfa: float = 0.1
-    max_times: int = 10000
+    max_times: int = 1000
 
     def __post_init__(self):
         self.problem = ReadTSPLIB(self.path)
@@ -53,15 +54,14 @@ class SimulatedAnnealing():
 
     def simulated_annealing(self, initial_solution=None):
         if initial_solution is not None:
-            vetor = copy.deepcopy(initial_solution)
+            vector = copy.deepcopy(initial_solution)
         else:
-            vetor = copy.deepcopy(self.nodes[1:])
-        _, e_base = self.energy_calculate(vetor, True)
+            vector = copy.deepcopy(self.nodes[1:])
+        _, e_base = self.energy_calculate(vector, True)
         times = 0
         T = self.T
-        vector = vetor
         while times < self.max_times:
-            vector_change, e_2 = self.energy_calculate(vetor, False)
+            vector_change, e_2 = self.energy_calculate(vector, False)
             delta = e_2 - e_base
             if delta < 0:
                 vector = vector_change[:]
@@ -75,10 +75,9 @@ class SimulatedAnnealing():
             T = self.reduct_t_geometric(T)
             if T < 1e-6:
                 break
-        best_rote = commons.define_routes(vector or vetor, self.demands, self.vehicle_capacity)
-
+        #best_rote = commons.define_routes(vector or vetor, self.demands, self.vehicle_capacity)
         #best_rote = self.define_routes(vector)
-        return vector, best_rote, e_base
+        return vector, _, e_base
 
     def multiple_executions(self, number_executions=500, initial_solution=None):
         cont = 0
@@ -91,4 +90,35 @@ class SimulatedAnnealing():
         return list_result, min(list_result) #TODO: return the best rote
 
 if __name__ == '__main__':
-    pass
+    path = "instances/A-n33-k6.txt"
+    SA=SimulatedAnnealing(path=path)
+    _, _, v = SA.simulated_annealing()
+    print(v)
+    # same_repetitions = 30
+    # save_data = 10
+    # T_ = np.arange(1000, 20001, 1000)
+    # alfa_ = np.arange(0.01, 0.999, 0.1)
+    # rep = 0
+    # all_data = list()
+    # result_aux = list()
+    # cont_save_data = 0
+    # for t in T_:
+    #     for alfa in alfa_:
+    #         print(t, alfa)
+    #         while rep < same_repetitions:
+    #             SA = SimulatedAnnealing(path=path, T=t, alfa=alfa)
+    #             _, _, v = SA.simulated_annealing()
+    #             result_aux.append(v)
+    #             rep += 1
+    #
+    #         result = {'T': t, 'alfa': alfa, "best_value": result_aux[:]}
+    #         all_data.append(result)
+    #         cont_save_data += 1
+    #         rep = 0
+    #         result_aux.clear()
+    #
+    #     if cont_save_data == save_data:
+    #         df = pd.DataFrame(all_data)
+    #         with pd.ExcelWriter('dados_SA.xlsx', engine="openpyxl", mode='a', if_sheet_exists="replace") as writer:
+    #             df.to_excel(writer, 'Planilha')
+    #         cont_save_data = 0
