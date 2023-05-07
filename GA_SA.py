@@ -83,8 +83,6 @@ class GeneticAlgorithm():
         self.population.extend([Individuo(size=len(self.nodes)) for i in range(self.population_size - self.survivors)])
 
     def genetic_algorithm(self):
-        break_condition = 250
-        break_count = 0
         self.population_generation(self.population_size)
         actual_generation = 0
         last_best = self.population[0].fitness()
@@ -94,14 +92,6 @@ class GeneticAlgorithm():
             self.population = self.population[:self.survivors]
             self.create_new_generation()
             print(self.population[0].fitness(), actual_generation)
-            if last_best == self.population[0].fitness():
-                break_count += 1
-                if break_count == break_condition:
-                    break
-            else:
-                last_best = self.population[0].fitness()
-                break_count = 0
-            print(actual_generation)
             actual_generation += 1
 
         self.sort_population()
