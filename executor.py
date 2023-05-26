@@ -74,20 +74,34 @@ def compute_results():
     time_aux = list()
     same_execution = 15
     data = list()
-    for path in os.listdir("instances"):
-        print(f'{path = }')
-        path = "instances/" + path
+    for p in os.listdir("all_instances"):
+        print(f'{p = }')
+        path = "all_instances/" + p
         for _ in range(same_execution):
             print(f'{_ = }')
             inicio = time.time()
-            GA_SA = Hibryd_Genetic_Algorithm(path=path)
-            best_value, ____ = GA_SA.genetic_algorithm()
+            try:
+                GA_SA = Hibryd_Genetic_Algorithm(path=path)
+                best_value, ____ = GA_SA.genetic_algorithm()
+            except:
+                continue
             fim = time.time()
             t_t = fim - inicio
             result_aux.append(best_value)
             time_aux.append((t_t))
 
-        result = {'instance': path, "best_value": result_aux[:], "time": time_aux[:]}
+        best_result = min(result_aux)
+        corresp_time = time_aux[result_aux.index(best_result)]
+
+        try:
+            value_i = GA_SA.problem.problem.comment.find("value") + 7
+            optimal_str = GA_SA.problem.problem.comment[value_i:]
+            end_best_value = optimal_str.find(")")
+            optimal_value = optimal_str[:end_best_value]
+            m = ((best_result - int(optimal_value) )/int(optimal_value)) * 100
+        except:
+            m = 'otimo nao encontrado'
+        result = {'instance': p, "optimal_value": optimal_value,  "best_value": best_result, "time": corresp_time, "gap": m}
         data.append(result)
         df = pd.DataFrame(data)
         result_aux.clear()
