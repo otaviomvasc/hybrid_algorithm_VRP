@@ -38,10 +38,10 @@ class Individuo(object):
 @dataclass
 class Hibryd_Genetic_Algorithm():
     path: str
-    T_SA: int = 10000
-    alfa_SA: float = 0.1
-    generations: int = 1400
-    news: int = 350
+    T_SA: int = 1000
+    alfa_SA: float = 0.9
+    generations: int = 1000
+    news: int = 320
     population_size: int = 100
     survivors: int = 50
     base_per_generation: int = field(init=False)
@@ -102,23 +102,12 @@ class Hibryd_Genetic_Algorithm():
     def genetic_algorithm(self):
 
         self.population_generation(self.population_size)
-        break_condition = 300
-        break_count = 0
         actual_generation = 0
-        if len(self.nodes) > 50:
-            self.specialist()
-        best = self.population[0].fitness()
+        self.specialist()
         while actual_generation < self.generations:
             self.create_mutation_SA()
             self.create_mutation()
             self.sort_population()
-            if best == self.population[0].fitness():
-                break_count += 1
-                if break_count == break_condition:
-                    break
-            else:
-                break_count = 0
-                best = self.population[0].fitness()
             #print(self.population[0].fitness(), actual_generation)
             self.create_mutation_SA()
             self.population = self.population[:self.survivors]
@@ -141,6 +130,3 @@ if __name__ == "__main__":
     print(best_value)
     print(fim - inicio)
 
-
-    #Rodar só o SA partindo de uma instância com valor 850 30000x e ver como se comporta
-    #com a variação aleatória dos parametros
