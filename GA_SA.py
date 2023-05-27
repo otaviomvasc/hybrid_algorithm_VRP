@@ -36,13 +36,16 @@ class Individuo(object):
 
 
 @dataclass
-class GeneticAlgorithm():
+class Hibryd_Genetic_Algorithm():
     path: str
-    generations: int = 100
-    news: int = 80
-    population_size: int = 50
-    survivors: int = 25
+    T_SA: int = 10000
+    alfa_SA: float = 0.1
+    generations: int = 1400
+    news: int = 350
+    population_size: int = 100
+    survivors: int = 50
     base_per_generation: int = field(init=False)
+
 
     def __post_init__(self):
         global vehicle_capacity, n_vehicles, matrix, demands
@@ -55,7 +58,7 @@ class GeneticAlgorithm():
         demands = self.problem.get_demands()
         self.base_per_generation = 30
         self.population = list()
-
+        self.SA = SimulatedAnnealing(path=self.path, T=self.T_SA, alfa=self.alfa_SA)
     def population_generation(self, pop):
         self.population = [Individuo(size=len(self.nodes)) for i in range(pop)]
 
@@ -68,13 +71,13 @@ class GeneticAlgorithm():
             new_i += 1
 
     def create_mutation_SA(self):
-        new_i = 0
-        while new_i < self.news:
-            SA = SimulatedAnnealing(path=path)
-            ind = self.population[random.randint(0, self.population_size - 1)].ind.copy()
-            n_ind, _,  fit = SA.simulated_annealing(initial_solution=ind)
-            self.population.append(Individuo(new_ind=n_ind))
-            new_i += 1
+        # if self.T_SA and self.alfa_SA:
+        #     SA = SimulatedAnnealing(path=self.path, T=self.T_SA, alfa=self.alfa_SA)
+        # else:
+        #     SA = SimulatedAnnealing(path=path)
+        ind = self.population[0].ind.copy()
+        n_ind, _,  fit = self.SA.simulated_annealing(initial_solution=ind)
+        self.population.append(Individuo(new_ind=n_ind))
 
     def sort_population(self):
         self.population = sorted(self.population, key=Individuo.fitness)  #ordenar objetos !!
@@ -82,26 +85,45 @@ class GeneticAlgorithm():
     def create_new_generation(self):
         self.population.extend([Individuo(size=len(self.nodes)) for i in range(self.population_size - self.survivors)])
 
+    def specialist(self):
+        nodes = list(self.nodes[1:])
+        cur_node = random.randint(2, len(self.nodes))
+        solution = [cur_node]
+        free_nodes = set(nodes)
+        free_nodes.remove(cur_node)
+        while free_nodes:
+            next_node = min(free_nodes, key=lambda x: matrix[cur_node, x])
+            free_nodes.remove(next_node)
+            solution.append(next_node)
+            cur_node = next_node
+
+        self.population.append(Individuo(new_ind=solution))
+
     def genetic_algorithm(self):
-        break_condition = 250
-        break_count = 0
+
         self.population_generation(self.population_size)
+        break_condition = 300
+        break_count = 0
         actual_generation = 0
-        last_best = self.population[0].fitness()
+        if len(self.nodes) > 50:
+            self.specialist()
+        best = self.population[0].fitness()
         while actual_generation < self.generations:
             self.create_mutation_SA()
+            self.create_mutation()
             self.sort_population()
-            self.population = self.population[:self.survivors]
-            self.create_new_generation()
-            print(self.population[0].fitness(), actual_generation)
-            if last_best == self.population[0].fitness():
+            if best == self.population[0].fitness():
                 break_count += 1
                 if break_count == break_condition:
                     break
             else:
-                last_best = self.population[0].fitness()
                 break_count = 0
-            print(actual_generation)
+                best = self.population[0].fitness()
+            #print(self.population[0].fitness(), actual_generation)
+            self.create_mutation_SA()
+            self.population = self.population[:self.survivors]
+            self.create_new_generation()
+            #print(actual_generation)
             actual_generation += 1
 
         self.sort_population()
@@ -112,9 +134,13 @@ class GeneticAlgorithm():
 if __name__ == "__main__":
     inicio = time.time()
     path = "instances/A-n32-k5.txt"
-    GA = GeneticAlgorithm(path=path)
+    GA = Hibryd_Genetic_Algorithm(path=path)
     best, best_value = GA.genetic_algorithm()
+    fim = time.time()
     print(best)
     print(best_value)
-    fim = time.time()
     print(fim - inicio)
+
+
+    #Rodar só o SA partindo de uma instância com valor 850 30000x e ver como se comporta
+    #com a variação aleatória dos parametros

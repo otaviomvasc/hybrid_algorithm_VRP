@@ -18,7 +18,6 @@ def GA_analyze():
     cont_save_data=0
 
     result_aux = list()
-    time_aux = list()
     #TODO: usar np.seed
 
     rep = 0
@@ -72,7 +71,7 @@ def GA_analyze():
 def compute_results():
     result_aux = list()
     time_aux = list()
-    same_execution = 1
+    same_execution = 15
     data = list()
     for p in os.listdir("all_instances"):
         print(f'{p = }')
